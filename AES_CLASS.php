@@ -1,10 +1,11 @@
-<?
+<?PHP
 /**
-AesPHP encryption
+NIBSS AES PHP - Kelvins Aghayedo @kelvinsaghayedo
 */
 class AES {
    
     protected $key;
+    protected $iv;
     protected $data;
     protected $method;
     /**
@@ -20,9 +21,10 @@ class AES {
      * @param type $blockSize
      * @param type $mode
      */
-    function __construct($data = null, $key = null, $blockSize = null, $mode = 'CBC') {
+    function __construct($data = null, $key = null,  $iv = null, $blockSize = null, $mode = 'CBC') {
         $this->setData($data);
         $this->setKey($key);
+        $this->setIv($iv);
         $this->setMethode($blockSize, $mode);
     }
     /**
@@ -38,6 +40,13 @@ class AES {
      */
     public function setKey($key) {
         $this->key = $key;
+    }
+    /**
+     * 
+     * @param type $iv
+     */
+     public function setIv($iv) {
+        $this->iv = $iv;
     }
     /**
      * CBC 128 192 256 
@@ -72,20 +81,14 @@ class AES {
             return FALSE;
         }
     }
-//it must be the same when you encrypt and decrypt
-     protected function getIV() {
-       // return '1234567890123456';
-       return 'replaceWithYourIV';
-         //return mcrypt_create_iv(mcrypt_get_iv_size($this->cipher, $this->mode), MCRYPT_RAND);
-         return openssl_random_pseudo_bytes(openssl_cipher_iv_length($this->method));
-     }
+ 
     /**
      * @return type
      * @throws Exception
      */
     public function encrypt() {
-        if ($this->validateParams()) { 
-            return trim(openssl_encrypt($this->data, $this->method, $this->key, $this->options,$this->getIV()));
+         if ($this->validateParams()) { 
+            return trim(openssl_encrypt($this->data, $this->method, $this->key, $this->options,$this->iv));
         } else {
             throw new Exception('Invlid params!');
         }
@@ -97,7 +100,7 @@ class AES {
      */
     public function decrypt() {
         if ($this->validateParams()) {
-           $ret=openssl_decrypt($this->data, $this->method, $this->key, $this->options,$this->getIV());
+           $ret=openssl_decrypt($this->data, $this->method, $this->key, $this->options,$this->iv);
           
            return   trim($ret); 
         } else {
